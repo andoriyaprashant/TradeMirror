@@ -11,6 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'sign_up2_model.dart';
 export 'sign_up2_model.dart';
+import 'package:http/http.dart' as http; 
+import 'dart:convert'; 
 
 class SignUp2Widget extends StatefulWidget {
   const SignUp2Widget({super.key});
@@ -48,6 +50,72 @@ class _SignUp2WidgetState extends State<SignUp2Widget> {
 
     super.dispose();
   }
+
+
+ Future<void> _signUpUser() async {
+    final url = Uri.parse('https://trademirror.onrender.com/user_register');
+    final headers = {
+      'Content-Type': 'application/json',
+      'accept': 'application/json',
+    };
+    final body = jsonEncode({
+      "username": _model.firstNameTextController?.text ?? "defaultUsername",
+      "full_name": "Default Name",
+      "date_of_birth": "1990-01-01",
+      "email": _model.eMailTextController?.text ?? "default@example.com",
+      "password": _model.passwordTextController?.text ?? "defaultPassword",
+      "regis_date": DateTime.now().toIso8601String(),
+      "aadhar": "defaultAadhar",
+      "mobile": "defaultMobileNumber",
+      "status": true,
+      "subscription_payment": false,
+      "broker_account": "defaultBrokerAccount",
+      "copied_traders": [],
+      "subscription_plan": "defaultPlan",
+      "Angel_Orders_Data": [],
+      "Dhan_Orders_Data": [],
+      "Zerodha_Orders_Data": [],
+      "Upstox_Orders_Data": [],
+      "paper_trading_balance": 0,
+      "watchlist": [],
+      "referred_by": "",
+      "referred_users": [],
+      "referral_rewards": 0,
+      "amount_deposited": 0,
+      "broker_acc_api": "defaultAPI",
+      "access_token": "",
+      "client_id": "",
+      "Angel_client_id": "",
+      "Angel_api_key": "",
+      "Angel_auth_token": "",
+      "Angel_username": "",
+      "Angel_secret_key": "",
+      "Angel_MPIN": "",
+      "upstox_access_token": "",
+      "upstox_api_key": "",
+      "upstox_api_secret": "",
+      "kite_access_token": "",
+      "kite_api_key": "",
+      "subscription_start_date": DateTime.now().toIso8601String(),
+      "subscription_end_date": DateTime.now().add(Duration(days: 365)).toIso8601String(),
+      "subscription_payment_status": false
+    });
+
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      if (context.mounted) {
+        context.pushNamed('KYCverification');
+      }
+    } else {
+
+      final errorResponse = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign up: ${errorResponse["detail"]}')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -394,38 +462,30 @@ class _SignUp2WidgetState extends State<SignUp2Widget> {
                             initialized: _model.checkboxGroupValues != null,
                           ),
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
-                                8.0, 20.0, 8.0, 0.0),
-                            child: FFButtonWidget(
-                              onPressed: () async {
-                                context.pushNamed('KYCverification');
-                              },
-                              text: 'Sign up',
-                              options: FFButtonOptions(
-                                width: MediaQuery.sizeOf(context).width * 0.85,
-                                height: 40.0,
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    24.0, 0.0, 24.0, 0.0),
-                                iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                    0.0, 0.0, 0.0, 0.0),
-                                color: FlutterFlowTheme.of(context).primary,
-                                textStyle: FlutterFlowTheme.of(context)
-                                    .titleMedium
-                                    .override(
-                                      fontFamily: 'Readex Pro',
-                                      color:
-                                          FlutterFlowTheme.of(context).tertiary,
-                                      letterSpacing: 0.0,
-                                    ),
-                                elevation: 3.0,
-                                borderSide: BorderSide(
-                                  color: Colors.transparent,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                          ),
+  padding: EdgeInsetsDirectional.fromSTEB(8.0, 20.0, 8.0, 0.0),
+  child: FFButtonWidget(
+    onPressed: _signUpUser,
+    text: 'Sign up',
+    options: FFButtonOptions(
+      width: MediaQuery.sizeOf(context).width * 0.85,
+      height: 40.0,
+      padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+      color: FlutterFlowTheme.of(context).primary,
+      textStyle: FlutterFlowTheme.of(context).titleMedium.override(
+        fontFamily: 'Readex Pro',
+        color: FlutterFlowTheme.of(context).tertiary,
+        letterSpacing: 0.0,
+      ),
+      elevation: 3.0,
+      borderSide: BorderSide(
+        color: Colors.transparent,
+        width: 1.0,
+      ),
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+  ),
+),
+
                           Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
                                 0.0, 20.0, 0.0, 0.0),
